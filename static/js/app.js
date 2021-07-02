@@ -6,6 +6,12 @@ var gauge=d3.select("#gauge");
 var names="";
 var metadata="";
 var samples="";
+var layoutbubble="";
+var tracebubble="";
+var tracebar="";
+var layoutbar="";
+var tracegague="";
+var layoutgague="";
 
 d3.json("./data/samples.json").then((data)=>{
 
@@ -24,31 +30,60 @@ d3.json("./data/samples.json").then((data)=>{
     //sample values are already on descending order, no need to sort
     console.log("Testing with slices")
     console.log(startsample.sample_values.slice(0,10))
-    var tracebar={
-        type:'bar',
-        y:startsample.sample_values.slice(0,10),
-        x:startsample.otu_ids.slice(0,10),
-        text:startsample.otu_labels.slice(0,10)
-    };
-
-    var layoutbar={
-        title:"Top 10 Bacteria Found in this Bellybutton"
-    };
-
+    settrace(startsample)
+    Plotly.newPlot('bubble', [tracebubble], layoutbubble);
     Plotly.newPlot('bar', [tracebar], layoutbar);
-    var tracegague={};
-    var tracebubble={};
-
-
-
-
-    
 
 
 
     
 });
 
+
+function optionChanged(){
+    var changename=dropdown_menu.property('value');
+
+    var dispmeta=metadata.find((metadata)=>metadata.id==changename);
+    updatemetadata(dispmeta)
+
+    var changesample=samples.find((samples)=>samples.id==changename);
+    settrace(changesample)
+    Plotly.newPlot('bubble', [tracebubble], layoutbubble);
+    Plotly.newPlot('bar', [tracebar], layoutbar);
+
+}
+
+
+function settrace(data){
+    tracebar={
+        type:'bar',
+        y:data.sample_values.slice(0,10),
+        x:data.otu_ids.slice(0,10).map((value)=>`OTU ${value}`),
+        text:data.otu_labels.slice(0,10)
+    };
+
+    layoutbar={
+        title:`Top 10 Bacteria Found in Subject #${data.id}`
+    };
+
+
+    tracegague={};
+    tracebubble={
+        mode:"markers",
+        x:data.otu_ids,
+        y:data.sample_values,
+        text:data.otu_labels,
+        marker:{
+            size:data.sample_values,
+            color:data.otu_ids
+        }
+    };
+    layoutbubble={
+        title:`Sample quantity in Subject ${data.id}`
+    };
+
+
+}
 
 
 function updatemetadata(data){
@@ -62,15 +97,3 @@ function updatemetadata(data){
 
 
 }
-
-
-
-function optionChanged(){
-    var changename=dropdown_menu.property('value');
-
-    var dispmeta=metadata.find((metadata)=>metadata.id==changename);
-    updatemetadata(dispmeta)
-}
-
-
-//"id" "ethnicity" "gender" "age" "location" "bbtype" "wfreq"
