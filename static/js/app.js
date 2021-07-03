@@ -79,7 +79,9 @@ function settrace(data){
         }
     };
     layoutbubble={
-        title:`Sample quantity in Subject ${data.id}`
+        title:`Sample quantity in Subject ${data.id}`,
+        xaxis:{title:"OTU ID Number"},
+        yaxis:{title:"Sample Value"}
     };
 
 
